@@ -1,0 +1,5 @@
+Dataset Type,Source,Spatial Resolution,Spectral Bands,Temporal Coverage,File Format,Fusion Potential,Archive Size,BITE Status,Frequency,Measurement Unit,Coverage,Data Period
+Satellite Multispectral,Copernicus Sentinel-2,10-60 meter pixels,13 bands (443-2190 nm),5-day repeat cycle,"GeoTIFF, SAFE format","Surface feature detection, change analysis",~100 GB per scene,IMMEDIATE HARVEST,,,,
+SAR Imagery,"Sentinel-1, COSMO-SkyMed",1-40 meters,,6-12 day repeat,"GeoTIFF, NetCDF",Subsurface void detection via interferometry,~1 GB per scene,PRIORITY TARGET,"C-band, X-band",,,
+Gravimetric Data,"Egyptian Geological Survey, research projects",Variable grid spacing,,,"ASCII grids, Oasis Montaj",Density anomaly mapping for chambers,<1 GB typical,SECONDARY TARGET,,mGal anomalies,Regional gravity surveys,
+Historical Maps,"Archaeological archives, digitized surveys",Variable scale,,,"Georeferenced TIFF, shapefiles","Baseline comparison, change detection",<100 MB per site,SUPPORTING DATA,,,Site-specific surveys,1800s-present

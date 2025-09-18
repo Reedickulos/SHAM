@@ -1,0 +1,6 @@
+Dataset,URL,Size,Content,Real_Data,Download_Ready
+Kaggle Egyptian Pyramids Dataset,https://www.kaggle.com/datasets/lsind18/egyptianpyramids,~50KB CSV file,"62 pyramid locations with coordinates, dimensions, construction dates",YES - Verified archaeological database,IMMEDIATE
+Copernicus Sentinel-2 Giza March 2025,https://dataspace.copernicus.eu/,~100MB per scene,10m multispectral imagery of Giza Plateau,"YES - Confirmed by Copernicus EU March 25, 2025 image",IMMEDIATE
+ASTER GDEM V3 Egypt Tiles,https://lpdaac.usgs.gov/products/astgtmv003/,~25MB per 1°x1° tile,30m elevation data covering Giza Plateau area,YES - Global elevation model confirmed active,IMMEDIATE
+USGS Landsat 8-9 Egypt Coverage,https://earthexplorer.usgs.gov/,~1GB per scene,"30m multispectral imagery, historical time series",YES - Global Landsat archive confirmed,IMMEDIATE
+USGS GPR Reference Data,https://data.usgs.gov/,"Variable, <100MB typical",Real GPR profiles from archaeological/geological surveys,YES - Multiple verified datasets from 2019-2021,IMMEDIATE

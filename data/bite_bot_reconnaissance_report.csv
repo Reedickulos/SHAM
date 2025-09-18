@@ -1,0 +1,12 @@
+Source Category,Repository,URL,Data Types,Egypt/Pyramid Relevance,Status,BITE Assessment
+NASA Data Portals,NASA Open Data Portal,https://data.nasa.gov,"Satellite imagery, aeronautics, space exploration",Limited - general earth science data,Accessible,Low priority - not specialized for archaeology
+NASA Data Portals,NASA Open Science Data Repository,https://www.nasa.gov/osdr/,"Space biology, microgravity experiments",None,Accessible,Exclude - not relevant to archaeological objectives
+ESA/Copernicus,Copernicus Sentinel-2,https://www.copernicus.eu/,"Multispectral satellite imagery, radar",HIGH - Has specific Giza Plateau imagery from March 2025,Open access,PRIORITY TARGET - Direct pyramid imaging capabilities
+USGS,USGS Geological Survey,https://www.usgs.gov/,"Geological maps, seismic data, topography",Medium - Has Sphinx/Giza imagery,Public access,Secondary target - geological context valuable
+NOAA Maritime,NOAA Ocean Exploration,https://oceanexplorer.noaa.gov/,"Maritime archaeology, underwater surveys",Low - marine focus only,Open access,Exclude - not relevant to pyramid chamber detection
+NOAA Climate,GODAR Project,https://www.ncei.noaa.gov/products/ocean-climate-laboratory/,Historical oceanographic data,None,Public,Exclude - oceanographic focus
+Zenodo,Zenodo Archaeological Collections,https://zenodo.org/,"Research datasets, archaeological documentation",HIGH - Contains Egypt archaeological datasets,Open access,PRIORITY TARGET - Active Egyptian archaeology projects
+Kaggle,Egyptian Pyramids Dataset,https://www.kaggle.com/datasets/lsind18/egyptianpyramids,"Pyramid catalog with coordinates, dimensions",VERY HIGH - Direct pyramid database,Open access,IMMEDIATE HARVEST - Core reference dataset
+ArXiv,arXiv.org,https://arxiv.org/,"Research papers, SAR imaging studies",HIGH - Contains GPR/SAR Egypt studies,Open access,PRIORITY TARGET - Latest research methodologies
+Academic Repositories,Archaeology Data Service,https://archaeologydataservice.ac.uk/,"Archaeological excavation data, GIS datasets",Medium - General archaeological data,FAIR compliant,Secondary target - methodology standards
+Specialized Archives,Archive.org,https://archive.org/,"Historical documents, 3D archaeological data",Medium - Archaeological 3D GIS resources,Open access,Secondary target - historical context
