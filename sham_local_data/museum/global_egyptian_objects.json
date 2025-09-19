@@ -1,0 +1,25 @@
+{
+  "total_objects": 2000000,
+  "sample_objects": [
+    {
+      "id": "GEM_001",
+      "title": "Painted limestone relief",
+      "period": "New Kingdom",
+      "provenance": "Saqqara",
+      "material": "Limestone, pigment",
+      "dimensions": "45.2 x 32.1 cm",
+      "museum": "Cairo Museum",
+      "inventory": "JE 47896"
+    },
+    {
+      "id": "GEM_002", 
+      "title": "Faience amulet",
+      "period": "Late Period",
+      "provenance": "Memphis",
+      "material": "Glazed faience",
+      "dimensions": "3.2 x 1.8 cm",
+      "museum": "British Museum",
+      "inventory": "EA 8931"
+    }
+  ]
+}

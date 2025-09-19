@@ -1,0 +1,6 @@
+X_UTM,Y_UTM,Magnetic_nT,Anomaly_Type,Site_Context
+654321,3234567,48750.2,Background,Desert surface
+654322,3234567,48755.8,Slight positive,Near surface artifact
+654323,3234567,48742.1,Negative,Possible void/tomb
+654324,3234567,48780.5,Strong positive,Metal/fired clay
+654325,3234567,48735.9,Strong negative,Large void/chamber

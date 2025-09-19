@@ -1,0 +1,7 @@
+@prefix bm: <http://collection.britishmuseum.org/id/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+
+bm:object/EA558 dc:title "Canopic jar of Imsety" ;
+    dc:description "Limestone canopic jar from Deir el-Bahari" ;
+    dc:date "Dynasty 11, c. 2055-2004 BC" ;
+    dc:spatial "Thebes, Egypt" .

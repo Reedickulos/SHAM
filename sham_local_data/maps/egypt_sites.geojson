@@ -1,0 +1,44 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Giza Pyramid Complex",
+        "type": "Archaeological Site",
+        "period": "Old Kingdom",
+        "unesco": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [31.1342, 29.9792]
+      }
+    },
+    {
+      "type": "Feature", 
+      "properties": {
+        "name": "Valley of the Kings",
+        "type": "Royal Cemetery",
+        "period": "New Kingdom", 
+        "unesco": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.6014, 25.7402]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Karnak Temple",
+        "type": "Temple Complex",
+        "period": "Middle Kingdom - Ptolemaic",
+        "unesco": true
+      },
+      "geometry": {
+        "type": "Point", 
+        "coordinates": [32.6575, 25.7189]
+      }
+    }
+  ]
+}
