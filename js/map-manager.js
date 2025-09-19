@@ -1,4 +1,4 @@
-// SHAM v4 Pro - Map Manager
+// SHAM v4 Pro - Map Manager (Fixed Version)
 // Interactive Leaflet.js map with archaeological sites and multispectral layers
 
 class MapManager {
@@ -14,10 +14,57 @@ class MapManager {
         };
         this.spectralLayers = {};
         this.currentSite = null;
-        this.initialize();
     }
 
-    initialize() {
+    async initialize() {
+        console.log('🗺️ Initializing Map Manager...');
+
+        try {
+            // Wait for DOM to be ready
+            if (document.readyState === 'loading') {
+                await new Promise(resolve => {
+                    document.addEventListener('DOMContentLoaded', resolve);
+                });
+            }
+
+            // Wait for archaeological data to be available
+            if (typeof ARCHAEOLOGICAL_SITES === 'undefined') {
+                console.log('⏳ Waiting for archaeological data...');
+                await this.waitForData();
+            }
+
+            console.log('📍 Creating map...');
+            this.createMap();
+
+            console.log('🏺 Loading archaeological sites...');
+            this.addArchaeologicalSites();
+
+            console.log('🎛️ Setting up controls...');
+            this.addLayerControls();
+            this.setupEventHandlers();
+            this.initializeSpectralLayers();
+
+            console.log('✅ Map Manager initialized successfully!');
+        } catch (error) {
+            console.error('❌ Error initializing Map Manager:', error);
+        }
+    }
+
+    async waitForData() {
+        let attempts = 0;
+        const maxAttempts = 50;
+
+        while (typeof ARCHAEOLOGICAL_SITES === 'undefined' && attempts < maxAttempts) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+        }
+
+        if (typeof ARCHAEOLOGICAL_SITES === 'undefined') {
+            throw new Error('Archaeological data failed to load');
+        }
+    }
+
+    createMap() {
         // Initialize map centered on Egypt
         this.map = L.map('map', {
             center: [26.8206, 30.8025], // Central Egypt
@@ -26,20 +73,10 @@ class MapManager {
             attributionControl: true
         });
 
+        console.log('📍 Map created at:', this.map.getCenter());
+
         // Add base layers
         this.addBaseLayers();
-
-        // Add archaeological sites
-        this.addArchaeologicalSites();
-
-        // Add layer controls
-        this.addLayerControls();
-
-        // Setup event handlers
-        this.setupEventHandlers();
-
-        // Initialize spectral layer toggle
-        this.initializeSpectralLayers();
     }
 
     addBaseLayers() {
@@ -48,6 +85,8 @@ class MapManager {
             attribution: 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, GeoEye, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, AeroGRID, IGN, and the GIS User Community',
             maxZoom: 19
         }).addTo(this.map);
+
+        console.log('🛰️ Satellite base layer added');
 
         // OpenStreetMap
         const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -70,80 +109,113 @@ class MapManager {
     }
 
     addArchaeologicalSites() {
-        // Add pyramids
-        ARCHAEOLOGICAL_SITES.pyramids.forEach(site => {
-            this.addSiteMarker(site, 'pyramids');
-        });
+        console.log('🏺 Loading archaeological sites...', ARCHAEOLOGICAL_SITES);
 
-        // Add temples
-        ARCHAEOLOGICAL_SITES.temples.forEach(site => {
-            this.addSiteMarker(site, 'temples');
-        });
+        let totalSites = 0;
 
-        // Add tombs
-        ARCHAEOLOGICAL_SITES.tombs.forEach(site => {
-            this.addSiteMarker(site, 'tombs');
-        });
+        try {
+            // Add pyramids
+            if (ARCHAEOLOGICAL_SITES.pyramids) {
+                console.log('🔺 Adding pyramids:', ARCHAEOLOGICAL_SITES.pyramids.length);
+                ARCHAEOLOGICAL_SITES.pyramids.forEach(site => {
+                    this.addSiteMarker(site, 'pyramids');
+                    totalSites++;
+                });
+            }
 
-        // Add settlements
-        ARCHAEOLOGICAL_SITES.settlements.forEach(site => {
-            this.addSiteMarker(site, 'settlements');
-        });
+            // Add temples
+            if (ARCHAEOLOGICAL_SITES.temples) {
+                console.log('🏛️ Adding temples:', ARCHAEOLOGICAL_SITES.temples.length);
+                ARCHAEOLOGICAL_SITES.temples.forEach(site => {
+                    this.addSiteMarker(site, 'temples');
+                    totalSites++;
+                });
+            }
 
-        // Add AI detected anomalies
-        ARCHAEOLOGICAL_SITES.ai_detected_anomalies.forEach(site => {
-            this.addSiteMarker(site, 'anomalies');
-        });
+            // Add tombs
+            if (ARCHAEOLOGICAL_SITES.tombs) {
+                console.log('⚱️ Adding tombs:', ARCHAEOLOGICAL_SITES.tombs.length);
+                ARCHAEOLOGICAL_SITES.tombs.forEach(site => {
+                    this.addSiteMarker(site, 'tombs');
+                    totalSites++;
+                });
+            }
 
-        // Add all layer groups to map
-        Object.values(this.layerGroups).forEach(group => {
-            group.addTo(this.map);
-        });
+            // Add settlements
+            if (ARCHAEOLOGICAL_SITES.settlements) {
+                console.log('🏙️ Adding settlements:', ARCHAEOLOGICAL_SITES.settlements.length);
+                ARCHAEOLOGICAL_SITES.settlements.forEach(site => {
+                    this.addSiteMarker(site, 'settlements');
+                    totalSites++;
+                });
+            }
+
+            // Add AI detected anomalies
+            if (ARCHAEOLOGICAL_SITES.ai_detected_anomalies) {
+                console.log('🤖 Adding anomalies:', ARCHAEOLOGICAL_SITES.ai_detected_anomalies.length);
+                ARCHAEOLOGICAL_SITES.ai_detected_anomalies.forEach(site => {
+                    this.addSiteMarker(site, 'anomalies');
+                    totalSites++;
+                });
+            }
+
+            // Add all layer groups to map
+            Object.values(this.layerGroups).forEach(group => {
+                group.addTo(this.map);
+            });
+
+            console.log(`✅ Total archaeological sites loaded: ${totalSites}`);
+            console.log(`📍 Total markers created: ${Object.keys(this.markers).length}`);
+
+        } catch (error) {
+            console.error('❌ Error loading archaeological sites:', error);
+        }
     }
 
     addSiteMarker(site, category) {
-        const config = SITE_CONFIGS[site.type] || SITE_CONFIGS[category];
+        try {
+            console.log(`📍 Adding marker for ${site.name} at [${site.coordinates}]`);
 
-        // Create custom icon
-        const iconHtml = `
-            <div class="site-marker ${site.type}" style="background-color: ${config.color}">
-                <i class="${config.icon}"></i>
-            </div>
-        `;
+            const config = SITE_CONFIGS[site.type] || SITE_CONFIGS[category] || {
+                color: '#e6b36a',
+                icon: 'fas fa-map-marker-alt',
+                size: 'medium'
+            };
 
-        const customIcon = L.divIcon({
-            html: iconHtml,
-            className: 'custom-marker',
-            iconSize: [24, 24],
-            iconAnchor: [12, 12],
-            popupAnchor: [0, -12]
-        });
+            // Create simple circular marker instead of complex HTML
+            const marker = L.circleMarker(site.coordinates, {
+                radius: 8,
+                fillColor: config.color,
+                color: '#ffffff',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8
+            });
 
-        // Create marker
-        const marker = L.marker(site.coordinates, { icon: customIcon });
+            // Create popup content
+            const popupContent = this.createPopupContent(site);
+            marker.bindPopup(popupContent, {
+                maxWidth: 400,
+                className: 'site-popup'
+            });
 
-        // Create popup content
-        const popupContent = this.createPopupContent(site);
-        marker.bindPopup(popupContent, {
-            maxWidth: 400,
-            className: 'site-popup'
-        });
+            // Add click handler for info panel
+            marker.on('click', () => {
+                console.log(`🔍 Site clicked: ${site.name}`);
+                this.showSiteInfo(site);
+                this.updateCoordinates(site.coordinates);
+            });
 
-        // Add click handler for info panel
-        marker.on('click', () => {
-            this.showSiteInfo(site);
-            this.updateCoordinates(site.coordinates);
-        });
+            // Store marker reference
+            this.markers[site.id] = marker;
 
-        // Store marker reference
-        this.markers[site.id] = marker;
+            // Add to appropriate layer group
+            this.layerGroups[category].addLayer(marker);
 
-        // Add to appropriate layer group
-        this.layerGroups[category].addLayer(marker);
+            console.log(`✅ Marker added for ${site.name}`);
 
-        // Add pulsing animation for anomalies
-        if (site.type === 'anomaly') {
-            marker.getElement().classList.add('pulse-animation');
+        } catch (error) {
+            console.error(`❌ Error adding marker for ${site.name}:`, error);
         }
     }
 
@@ -198,6 +270,45 @@ class MapManager {
             position: 'topright',
             collapsed: false
         }).addTo(this.map);
+
+        console.log('🎛️ Layer controls added');
+    }
+
+    setupEventHandlers() {
+        // Map click handler for coordinates display
+        this.map.on('click', (e) => {
+            this.updateCoordinates([e.latlng.lat, e.latlng.lng]);
+        });
+
+        // Map move handler for real-time coordinate updates
+        this.map.on('mousemove', (e) => {
+            this.updateCoordinates([e.latlng.lat, e.latlng.lng]);
+        });
+
+        // Zoom to Egypt button
+        document.getElementById('zoom-egypt')?.addEventListener('click', () => {
+            console.log('🔍 Zooming to Egypt');
+            this.map.setView([26.8206, 30.8025], 6);
+        });
+
+        // Zoom to Giza button
+        document.getElementById('zoom-giza')?.addEventListener('click', () => {
+            console.log('🔍 Zooming to Giza');
+            this.map.setView([29.9792, 31.1342], 13);
+        });
+
+        // Zoom to Valley of Kings button
+        document.getElementById('zoom-valley-kings')?.addEventListener('click', () => {
+            console.log('🔍 Zooming to Valley of Kings');
+            this.map.setView([25.7402, 32.6014], 15);
+        });
+
+        // Satellite view toggle
+        document.getElementById('satellite-view')?.addEventListener('click', () => {
+            this.toggleSatelliteView();
+        });
+
+        console.log('🎮 Event handlers set up');
     }
 
     initializeSpectralLayers() {
@@ -220,6 +331,7 @@ class MapManager {
             const toggle = document.getElementById(`${layer}-layer`);
             if (toggle) {
                 toggle.addEventListener('change', (e) => {
+                    console.log(`🛰️ ${layer.toUpperCase()} layer toggled:`, e.target.checked);
                     this.toggleSpectralLayer(layer, e.target.checked);
                 });
             }
@@ -273,38 +385,6 @@ class MapManager {
         }
     }
 
-    setupEventHandlers() {
-        // Map click handler for coordinates display
-        this.map.on('click', (e) => {
-            this.updateCoordinates([e.latlng.lat, e.latlng.lng]);
-        });
-
-        // Map move handler for real-time coordinate updates
-        this.map.on('mousemove', (e) => {
-            this.updateCoordinates([e.latlng.lat, e.latlng.lng]);
-        });
-
-        // Zoom to Egypt button
-        document.getElementById('zoom-egypt')?.addEventListener('click', () => {
-            this.map.setView([26.8206, 30.8025], 6);
-        });
-
-        // Zoom to Giza button
-        document.getElementById('zoom-giza')?.addEventListener('click', () => {
-            this.map.setView([29.9792, 31.1342], 13);
-        });
-
-        // Zoom to Valley of Kings button
-        document.getElementById('zoom-valley-kings')?.addEventListener('click', () => {
-            this.map.setView([25.7402, 32.6014], 15);
-        });
-
-        // Satellite view toggle
-        document.getElementById('satellite-view')?.addEventListener('click', () => {
-            this.toggleSatelliteView();
-        });
-    }
-
     updateCoordinates(coords) {
         const coordElement = document.getElementById('current-coordinates');
         if (coordElement) {
@@ -325,6 +405,7 @@ class MapManager {
         if (!site) return;
 
         this.currentSite = site;
+        console.log('📖 Showing site info for:', site.name);
 
         // Update info panel
         if (window.uiManager) {
@@ -350,6 +431,35 @@ class MapManager {
         return allSites.find(site => site.id === siteId);
     }
 
+    highlightSite(siteId) {
+        const marker = this.markers[siteId];
+        if (marker) {
+            console.log(`✨ Highlighting site: ${siteId}`);
+
+            // Pan to site
+            this.map.setView(marker.getLatLng(), 12);
+
+            // Open popup
+            marker.openPopup();
+
+            // Add temporary highlight effect
+            const originalStyle = {
+                radius: marker.getRadius(),
+                fillColor: marker.options.fillColor
+            };
+
+            marker.setStyle({
+                radius: 12,
+                fillColor: '#f6e05e'
+            });
+
+            // Remove highlight after 3 seconds
+            setTimeout(() => {
+                marker.setStyle(originalStyle);
+            }, 3000);
+        }
+    }
+
     toggleSatelliteView() {
         // Implementation for satellite view toggle
         const button = document.getElementById('satellite-view');
@@ -371,48 +481,52 @@ class MapManager {
             this.baseLayers.Satellite.addTo(this.map);
         }
     }
+}
 
-    highlightSite(siteId) {
-        const marker = this.markers[siteId];
-        if (marker) {
-            // Add highlight effect
-            marker.getElement().classList.add('highlighted');
+// Initialize map manager when all scripts are loaded
+let mapManager;
 
-            // Pan to site
-            this.map.setView(marker.getLatLng(), 12);
+// Enhanced initialization with better error handling
+function initializeMapManager() {
+    console.log('🚀 Starting Map Manager initialization...');
 
-            // Open popup
-            marker.openPopup();
+    try {
+        mapManager = new MapManager();
+        mapManager.initialize();
+        window.mapManager = mapManager; // Make globally accessible
 
-            // Remove highlight after 3 seconds
-            setTimeout(() => {
-                marker.getElement().classList.remove('highlighted');
-            }, 3000);
+        console.log('🎉 Map Manager ready!');
+    } catch (error) {
+        console.error('💥 Failed to initialize Map Manager:', error);
+
+        // Show user-friendly error
+        const mapContainer = document.getElementById('map');
+        if (mapContainer) {
+            mapContainer.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: #1a1f2e; color: white; text-align: center; padding: 2rem;">
+                    <div>
+                        <h3>🗺️ Map Loading Error</h3>
+                        <p>Please refresh the page to reload the archaeological sites.</p>
+                        <button onclick="location.reload()" style="background: #e6b36a; color: #1a1f2e; border: none; padding: 0.5rem 1rem; border-radius: 4px; margin-top: 1rem; cursor: pointer;">Refresh Page</button>
+                    </div>
+                </div>
+            `;
         }
-    }
-
-    exportMapData() {
-        const mapData = {
-            center: this.map.getCenter(),
-            zoom: this.map.getZoom(),
-            bounds: this.map.getBounds(),
-            visible_layers: Object.keys(this.layerGroups).filter(key =>
-                this.map.hasLayer(this.layerGroups[key])
-            ),
-            active_spectral_layers: Object.keys(this.spectralLayers).filter(key =>
-                this.spectralLayers[key] && this.map.hasLayer(this.spectralLayers[key])
-            ),
-            current_site: this.currentSite?.id || null,
-            timestamp: new Date().toISOString()
-        };
-
-        return mapData;
     }
 }
 
-// Initialize map manager when DOM is loaded
-let mapManager;
-document.addEventListener('DOMContentLoaded', () => {
-    mapManager = new MapManager();
-    window.mapManager = mapManager; // Make globally accessible
-});
+// Multiple initialization attempts
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeMapManager);
+} else {
+    // Try immediate initialization
+    setTimeout(initializeMapManager, 100);
+}
+
+// Fallback initialization
+setTimeout(() => {
+    if (!window.mapManager) {
+        console.log('🔄 Fallback initialization...');
+        initializeMapManager();
+    }
+}, 2000);
