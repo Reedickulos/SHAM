@@ -1,0 +1,39 @@
+# GitHub Pages Configuration for SHAM v4 Pro
+title: "SHAM v4 Pro - Archaeological Intelligence Platform"
+description: "Advanced AI-powered archaeological discovery platform for Egypt"
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+
+# GitHub Pages settings
+github: [metadata]
+safe: true
+source: .
+destination: ./_site
+incremental: false
+highlighter: rouge
+gist:
+  noscript: false
+
+# Collection settings
+collections_dir: collections
+
+# Plugin settings
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+
+# Exclude files from processing
+exclude:
+  - README.md
+  - package.json
+  - node_modules/
+  - .git/
+  - .github/workflows/
+
+# Include important files
+include:
+  - css/
+  - js/
+  - index.html
