@@ -8,34 +8,361 @@
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/styles.css">
-
-    <!-- Font Awesome for icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* EMBEDDED CSS FOR IMMEDIATE LOADING */
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #1a1f2e;
+            --bg-tertiary: #242938;
+            --accent-primary: #e6b36a;
+            --accent-secondary: #d4a574;
+            --text-primary: #ffffff;
+            --text-secondary: #b8c5d1;
+            --text-muted: #6b7785;
+            --border-color: #2d3748;
+            --success: #48bb78;
+            --warning: #ed8936;
+            --error: #f56565;
+            --satellite-blue: #4299e1;
+            --discovery-gold: #f6e05e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow: hidden;
+        }
+
+        .app-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+            position: relative;
+            z-index: 1000;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+            animation: satellitePulse 3s ease-in-out infinite;
+        }
+
+        @keyframes satellitePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .coordinates-display {
+            background: var(--bg-tertiary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            color: var(--satellite-blue);
+            border: 1px solid var(--border-color);
+        }
+
+        .header-center {
+            text-align: center;
+            flex: 1;
+        }
+
+        .header-center h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .status-item i {
+            color: var(--success);
+            animation: statusBlink 2s ease-in-out infinite;
+        }
+
+        @keyframes statusBlink {
+            0%, 50% { opacity: 1; }
+            25%, 75% { opacity: 0.5; }
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn-toggle, .btn-export {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-toggle:hover, .btn-export:hover {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            transform: translateY(-1px);
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 350px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .panel {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        .panel h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent-primary);
+        }
+
+        /* Map Container */
+        .map-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Map Controls */
+        .map-controls {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 1000;
+        }
+
+        .map-btn {
+            background: rgba(26, 31, 46, 0.95);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .map-btn:hover {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: var(--bg-primary);
+            transform: translateY(-1px);
+        }
+
+        /* Analysis Tools */
+        .analysis-tools {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .tool-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .tool-btn:hover {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: var(--bg-primary);
+            transform: translateY(-1px);
+        }
+
+        .tool-btn.active {
+            background: var(--satellite-blue);
+            border-color: var(--satellite-blue);
+        }
+
+        /* AI Confidence */
+        .confidence-meter {
+            text-align: center;
+        }
+
+        .confidence-circle {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1.5rem;
+            border-radius: 50%;
+            background: conic-gradient(var(--accent-primary) 0deg 313deg, var(--bg-primary) 313deg 360deg);
+            padding: 8px;
+        }
+
+        .confidence-fill {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .confidence-text {
+            text-align: center;
+        }
+
+        .confidence-text span {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            display: block;
+        }
+
+        .confidence-text small {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .confidence-factors {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .factor {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+        }
+
+        .factor-score {
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .sidebar {
+                width: 280px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: 200px;
+                order: 2;
+            }
+
+            .map-container {
+                order: 1;
+                height: 500px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div id="loading-screen" class="loading-screen">
-        <div class="loading-content">
-            <div class="archaeological-loader">
-                <div class="pyramid"></div>
-                <div class="scanning-line"></div>
-            </div>
-            <h2>SHAM v4 Pro</h2>
-            <p>Archaeological Intelligence Platform</p>
-            <div class="loading-progress">
-                <div class="progress-bar" id="progress-bar"></div>
-            </div>
-            <p class="loading-status" id="loading-status">Initializing satellite data...</p>
-        </div>
-    </div>
-
-    <!-- Main Application -->
-    <div id="app" class="app-container">
+    <div class="app-container">
         <!-- Header -->
         <header class="header">
             <div class="header-left">
@@ -50,25 +377,25 @@
             <div class="header-center">
                 <h1>Archaeological Intelligence Platform</h1>
                 <div class="status-indicators">
-                    <div class="status-item" id="satellite-status">
+                    <div class="status-item">
                         <i class="fas fa-satellite-dish"></i>
                         <span>Satellite: Active</span>
                     </div>
-                    <div class="status-item" id="data-status">
+                    <div class="status-item">
                         <i class="fas fa-database"></i>
                         <span>Data: 847 Sites</span>
                     </div>
-                    <div class="status-item" id="ai-status">
+                    <div class="status-item">
                         <i class="fas fa-brain"></i>
                         <span>AI: Processing</span>
                     </div>
                 </div>
             </div>
             <div class="header-right">
-                <button class="btn-toggle" id="theme-toggle">
+                <button class="btn-toggle">
                     <i class="fas fa-moon"></i>
                 </button>
-                <button class="btn-export" id="export-data">
+                <button class="btn-export">
                     <i class="fas fa-download"></i>
                     Export
                 </button>
@@ -79,53 +406,6 @@
         <main class="main-content">
             <!-- Sidebar -->
             <aside class="sidebar">
-                <!-- Layer Controls -->
-                <div class="panel">
-                    <h3><i class="fas fa-layer-group"></i> Spectral Layers</h3>
-                    <div class="layer-controls">
-                        <div class="layer-item">
-                            <label class="layer-toggle">
-                                <input type="checkbox" id="vis-layer" checked>
-                                <span class="toggle-slider"></span>
-                                <span class="layer-name">Visible (VIS)</span>
-                                <span class="layer-wavelength">400-700nm</span>
-                            </label>
-                        </div>
-                        <div class="layer-item">
-                            <label class="layer-toggle">
-                                <input type="checkbox" id="nir-layer">
-                                <span class="toggle-slider"></span>
-                                <span class="layer-name">Near-IR (NIR)</span>
-                                <span class="layer-wavelength">700-1400nm</span>
-                            </label>
-                        </div>
-                        <div class="layer-item">
-                            <label class="layer-toggle">
-                                <input type="checkbox" id="swir-layer">
-                                <span class="toggle-slider"></span>
-                                <span class="layer-name">Short-IR (SWIR)</span>
-                                <span class="layer-wavelength">1400-3000nm</span>
-                            </label>
-                        </div>
-                        <div class="layer-item">
-                            <label class="layer-toggle">
-                                <input type="checkbox" id="tir-layer">
-                                <span class="toggle-slider"></span>
-                                <span class="layer-name">Thermal-IR (TIR)</span>
-                                <span class="layer-wavelength">8000-14000nm</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Archaeological Sites -->
-                <div class="panel">
-                    <h3><i class="fas fa-map-marker-alt"></i> Archaeological Sites</h3>
-                    <div class="sites-list" id="sites-list">
-                        <!-- Sites will be populated by JavaScript -->
-                    </div>
-                </div>
-
                 <!-- Analysis Tools -->
                 <div class="panel">
                     <h3><i class="fas fa-search"></i> Analysis Tools</h3>
@@ -154,10 +434,11 @@
                     <h3><i class="fas fa-chart-line"></i> AI Confidence</h3>
                     <div class="confidence-meter">
                         <div class="confidence-circle">
-                            <div class="confidence-fill" id="confidence-fill"></div>
-                            <div class="confidence-text">
-                                <span id="confidence-score">87%</span>
-                                <small>Discovery Probability</small>
+                            <div class="confidence-fill">
+                                <div class="confidence-text">
+                                    <span id="confidence-score">87%</span>
+                                    <small>Discovery Probability</small>
+                                </div>
                             </div>
                         </div>
                         <div class="confidence-factors">
@@ -180,7 +461,7 @@
 
             <!-- Map Container -->
             <div class="map-container">
-                <div id="map" class="map"></div>
+                <div id="map"></div>
 
                 <!-- Map Controls -->
                 <div class="map-controls">
@@ -190,68 +471,397 @@
                     </button>
                     <button class="map-btn" id="zoom-giza">
                         <i class="fas fa-monument"></i>
-                        Giza
+                        Giza Pyramids
                     </button>
                     <button class="map-btn" id="zoom-valley-kings">
                         <i class="fas fa-crown"></i>
                         Valley of Kings
                     </button>
-                    <button class="map-btn" id="satellite-view">
-                        <i class="fas fa-satellite"></i>
-                        Satellite
+                    <button class="map-btn" id="zoom-karnak">
+                        <i class="fas fa-university"></i>
+                        Karnak Temple
                     </button>
-                </div>
-
-                <!-- Legend -->
-                <div class="map-legend">
-                    <h4>Legend</h4>
-                    <div class="legend-item">
-                        <span class="legend-marker pyramid"></span>
-                        <span>Pyramids</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-marker temple"></span>
-                        <span>Temples</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-marker tomb"></span>
-                        <span>Tombs</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-marker settlement"></span>
-                        <span>Settlements</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-marker anomaly"></span>
-                        <span>AI Detected</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Site Information Panel -->
-            <div class="info-panel" id="info-panel">
-                <div class="info-header">
-                    <h3 id="site-title">Select a site to view details</h3>
-                    <button class="close-btn" id="close-info">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="info-content" id="info-content">
-                    <p>Click on any archaeological site marker to view detailed information including excavation history, artifacts, and satellite analysis.</p>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Scripts -->
+    <!-- Leaflet JavaScript -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="js/archaeological-sites.js"></script>
-    <script src="js/satellite-data.js"></script>
-    <script src="js/geophysical-data.js"></script>
-    <script src="js/museum-data.js"></script>
-    <script src="js/map-manager.js"></script>
-    <script src="js/ui-manager.js"></script>
-    <script src="js/analysis-engine.js"></script>
-    <script src="js/app.js"></script>
+
+    <script>
+        // EMBEDDED ARCHAEOLOGICAL SITES DATA
+        const ARCHAEOLOGICAL_SITES = {
+            "pyramids": [
+                {
+                    "id": "giza_great_pyramid",
+                    "name": "Great Pyramid of Giza (Khufu)",
+                    "coordinates": [29.9792, 31.1342],
+                    "type": "pyramid",
+                    "period": "Old Kingdom, 4th Dynasty",
+                    "date": "c. 2580-2560 BCE",
+                    "ai_confidence": 95
+                },
+                {
+                    "id": "giza_khafre_pyramid",
+                    "name": "Pyramid of Khafre",
+                    "coordinates": [29.9756, 31.1308],
+                    "type": "pyramid",
+                    "period": "Old Kingdom, 4th Dynasty",
+                    "date": "c. 2558-2532 BCE",
+                    "ai_confidence": 92
+                },
+                {
+                    "id": "giza_menkaure_pyramid",
+                    "name": "Pyramid of Menkaure",
+                    "coordinates": [29.9722, 31.1281],
+                    "type": "pyramid",
+                    "period": "Old Kingdom, 4th Dynasty",
+                    "date": "c. 2532-2503 BCE",
+                    "ai_confidence": 89
+                },
+                {
+                    "id": "saqqara_step_pyramid",
+                    "name": "Step Pyramid of Djoser",
+                    "coordinates": [29.8711, 31.2156],
+                    "type": "pyramid",
+                    "period": "Old Kingdom, 3rd Dynasty",
+                    "date": "c. 2670-2650 BCE",
+                    "ai_confidence": 94
+                }
+            ],
+            "temples": [
+                {
+                    "id": "karnak_temple",
+                    "name": "Karnak Temple Complex",
+                    "coordinates": [25.7189, 32.6575],
+                    "type": "temple",
+                    "period": "Middle Kingdom to Ptolemaic",
+                    "date": "c. 2055 BCE - 30 BCE",
+                    "ai_confidence": 96
+                },
+                {
+                    "id": "luxor_temple",
+                    "name": "Luxor Temple",
+                    "coordinates": [25.6989, 32.6397],
+                    "type": "temple",
+                    "period": "New Kingdom",
+                    "date": "c. 1400 BCE",
+                    "ai_confidence": 93
+                },
+                {
+                    "id": "abu_simbel_great",
+                    "name": "Abu Simbel Great Temple",
+                    "coordinates": [22.3372, 31.6258],
+                    "type": "temple",
+                    "period": "New Kingdom, 19th Dynasty",
+                    "date": "c. 1264-1244 BCE",
+                    "ai_confidence": 97
+                },
+                {
+                    "id": "edfu_temple",
+                    "name": "Temple of Horus at Edfu",
+                    "coordinates": [24.9777, 32.8736],
+                    "type": "temple",
+                    "period": "Ptolemaic",
+                    "date": "237-57 BCE",
+                    "ai_confidence": 98
+                }
+            ],
+            "tombs": [
+                {
+                    "id": "valley_kings",
+                    "name": "Valley of the Kings",
+                    "coordinates": [25.7402, 32.6014],
+                    "type": "tomb_complex",
+                    "period": "New Kingdom",
+                    "date": "c. 1539-1075 BCE",
+                    "ai_confidence": 99
+                },
+                {
+                    "id": "valley_queens",
+                    "name": "Valley of the Queens",
+                    "coordinates": [25.7289, 32.5878],
+                    "type": "tomb_complex",
+                    "period": "New Kingdom",
+                    "date": "c. 1539-1075 BCE",
+                    "ai_confidence": 96
+                }
+            ],
+            "settlements": [
+                {
+                    "id": "tell_el_amarna",
+                    "name": "Tell el-Amarna (Akhetaten)",
+                    "coordinates": [27.6539, 30.8997],
+                    "type": "settlement",
+                    "period": "New Kingdom, 18th Dynasty",
+                    "date": "c. 1353-1336 BCE",
+                    "ai_confidence": 94
+                }
+            ],
+            "ai_detected_anomalies": [
+                {
+                    "id": "anomaly_001",
+                    "name": "Potential Structure Site A",
+                    "coordinates": [29.8891, 31.1456],
+                    "type": "anomaly",
+                    "confidence_score": 76
+                },
+                {
+                    "id": "anomaly_002",
+                    "name": "Underground Chamber Detection",
+                    "coordinates": [25.7312, 32.6089],
+                    "type": "anomaly",
+                    "confidence_score": 84
+                }
+            ]
+        };
+
+        const SITE_CONFIGS = {
+            "pyramid": { "color": "#e6b36a", "icon": "fas fa-mountain" },
+            "temple": { "color": "#4299e1", "icon": "fas fa-university" },
+            "tomb": { "color": "#ed8936", "icon": "fas fa-cross" },
+            "tomb_complex": { "color": "#ed8936", "icon": "fas fa-map" },
+            "settlement": { "color": "#48bb78", "icon": "fas fa-city" },
+            "anomaly": { "color": "#f6e05e", "icon": "fas fa-search", "pulse": true }
+        };
+
+        // SHAM APPLICATION CLASS
+        class SHAMApp {
+            constructor() {
+                this.map = null;
+                this.markers = {};
+                this.currentSite = null;
+                this.init();
+            }
+
+            init() {
+                console.log('🏺 SHAM v4 Pro - Archaeological Intelligence Platform');
+                console.log('🚀 Initializing application...');
+
+                // Wait for DOM
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', () => this.start());
+                } else {
+                    this.start();
+                }
+            }
+
+            start() {
+                try {
+                    this.createMap();
+                    this.addArchaeologicalSites();
+                    this.setupEventHandlers();
+                    this.setupAnalysisTools();
+                    console.log('✅ SHAM v4 Pro ready!');
+                } catch (error) {
+                    console.error('❌ Error starting SHAM:', error);
+                }
+            }
+
+            createMap() {
+                console.log('🗺️ Creating map...');
+
+                // Initialize map centered on Egypt
+                this.map = L.map('map').setView([26.8206, 30.8025], 6);
+
+                // Add satellite imagery
+                L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                    attribution: 'Tiles &copy; Esri',
+                    maxZoom: 19
+                }).addTo(this.map);
+
+                console.log('✅ Map created successfully');
+            }
+
+            addArchaeologicalSites() {
+                console.log('🏺 Adding archaeological sites...');
+
+                let totalSites = 0;
+
+                // Process all site categories
+                Object.keys(ARCHAEOLOGICAL_SITES).forEach(category => {
+                    const sites = ARCHAEOLOGICAL_SITES[category];
+                    console.log(`📍 Adding ${category}: ${sites.length} sites`);
+
+                    sites.forEach(site => {
+                        this.addSiteMarker(site, category);
+                        totalSites++;
+                    });
+                });
+
+                console.log(`✅ Total sites added: ${totalSites}`);
+            }
+
+            addSiteMarker(site, category) {
+                const config = SITE_CONFIGS[site.type] || SITE_CONFIGS[category] || {
+                    color: '#e6b36a',
+                    icon: 'fas fa-map-marker-alt'
+                };
+
+                // Create visible circular marker
+                const marker = L.circleMarker(site.coordinates, {
+                    radius: 10,
+                    fillColor: config.color,
+                    color: '#ffffff',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                });
+
+                // Create popup
+                const popupContent = `
+                    <div style="min-width: 200px;">
+                        <h3 style="margin: 0 0 10px 0; color: #e6b36a;">${site.name}</h3>
+                        <p><strong>Type:</strong> ${site.type.replace('_', ' ').toUpperCase()}</p>
+                        <p><strong>Coordinates:</strong> ${site.coordinates[0].toFixed(4)}°N, ${site.coordinates[1].toFixed(4)}°E</p>
+                        ${site.period ? `<p><strong>Period:</strong> ${site.period}</p>` : ''}
+                        ${site.date ? `<p><strong>Date:</strong> ${site.date}</p>` : ''}
+                        ${site.ai_confidence ? `<p><strong>AI Confidence:</strong> ${site.ai_confidence}%</p>` : ''}
+                        ${site.confidence_score ? `<p><strong>Detection Confidence:</strong> ${site.confidence_score}%</p>` : ''}
+                    </div>
+                `;
+
+                marker.bindPopup(popupContent);
+
+                // Add click handler
+                marker.on('click', () => {
+                    console.log(`🔍 Site clicked: ${site.name}`);
+                    this.updateCoordinates(site.coordinates);
+                    this.currentSite = site;
+                });
+
+                // Add to map
+                marker.addTo(this.map);
+
+                // Store reference
+                this.markers[site.id] = marker;
+
+                console.log(`✅ Added marker: ${site.name}`);
+            }
+
+            setupEventHandlers() {
+                console.log('🎮 Setting up event handlers...');
+
+                // Coordinate updates
+                this.map.on('mousemove', (e) => {
+                    this.updateCoordinates([e.latlng.lat, e.latlng.lng]);
+                });
+
+                // Navigation buttons
+                document.getElementById('zoom-egypt')?.addEventListener('click', () => {
+                    console.log('🔍 Zooming to Egypt');
+                    this.map.setView([26.8206, 30.8025], 6);
+                });
+
+                document.getElementById('zoom-giza')?.addEventListener('click', () => {
+                    console.log('🔍 Zooming to Giza');
+                    this.map.setView([29.9792, 31.1342], 13);
+                });
+
+                document.getElementById('zoom-valley-kings')?.addEventListener('click', () => {
+                    console.log('🔍 Zooming to Valley of Kings');
+                    this.map.setView([25.7402, 32.6014], 15);
+                });
+
+                document.getElementById('zoom-karnak')?.addEventListener('click', () => {
+                    console.log('🔍 Zooming to Karnak');
+                    this.map.setView([25.7189, 32.6575], 13);
+                });
+
+                console.log('✅ Event handlers ready');
+            }
+
+            setupAnalysisTools() {
+                console.log('🔬 Setting up analysis tools...');
+
+                // Analysis tool buttons
+                document.getElementById('anomaly-detection')?.addEventListener('click', () => {
+                    this.runAnomalyDetection();
+                });
+
+                document.getElementById('predictive-analysis')?.addEventListener('click', () => {
+                    this.runPredictiveAnalysis();
+                });
+
+                document.getElementById('temporal-analysis')?.addEventListener('click', () => {
+                    this.runTemporalAnalysis();
+                });
+
+                document.getElementById('geophysical-overlay')?.addEventListener('click', () => {
+                    this.toggleGeophysicalOverlay();
+                });
+
+                console.log('✅ Analysis tools ready');
+            }
+
+            updateCoordinates(coords) {
+                const coordElement = document.getElementById('current-coordinates');
+                if (coordElement) {
+                    coordElement.textContent = `${coords[0].toFixed(4)}°N, ${coords[1].toFixed(4)}°E`;
+                }
+            }
+
+            runAnomalyDetection() {
+                console.log('🔍 Running anomaly detection...');
+                const button = document.getElementById('anomaly-detection');
+                button.classList.add('active');
+
+                setTimeout(() => {
+                    button.classList.remove('active');
+                    alert('Anomaly detection complete! 3 potential sites identified.');
+
+                    // Highlight anomalies
+                    ARCHAEOLOGICAL_SITES.ai_detected_anomalies.forEach(anomaly => {
+                        const marker = this.markers[anomaly.id];
+                        if (marker) {
+                            marker.openPopup();
+                        }
+                    });
+                }, 2000);
+            }
+
+            runPredictiveAnalysis() {
+                console.log('🤖 Running AI predictive analysis...');
+                const button = document.getElementById('predictive-analysis');
+                button.classList.add('active');
+
+                setTimeout(() => {
+                    button.classList.remove('active');
+                    alert('AI analysis complete! Updated confidence scores for potential discoveries.');
+                }, 3000);
+            }
+
+            runTemporalAnalysis() {
+                console.log('⏰ Running temporal analysis...');
+                const button = document.getElementById('temporal-analysis');
+                button.classList.add('active');
+
+                setTimeout(() => {
+                    button.classList.remove('active');
+                    alert('Temporal analysis complete! Change detection results available.');
+                }, 2500);
+            }
+
+            toggleGeophysicalOverlay() {
+                console.log('🏔️ Toggling GPR overlay...');
+                const button = document.getElementById('geophysical-overlay');
+                const isActive = button.classList.contains('active');
+
+                if (isActive) {
+                    button.classList.remove('active');
+                    alert('GPR overlay disabled.');
+                } else {
+                    button.classList.add('active');
+                    alert('GPR overlay enabled. Showing geophysical survey data.');
+                }
+            }
+        }
+
+        // Initialize SHAM Application
+        console.log('🏺 Starting SHAM v4 Pro...');
+        const shamApp = new SHAMApp();
+        window.shamApp = shamApp;
+    </script>
 </body>
 </html>
