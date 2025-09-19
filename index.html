@@ -91,45 +91,61 @@
       },
 
       init() {
-        this.map = L.map('map').setView([26.8206, 30.8025], 6); // Centered on Egypt
+        try {
+          this.map = L.map('map').setView([26.8206, 30.8025], 6); // Centered on Egypt
 
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-          subdomains: 'abcd',
-          maxZoom: 20
-        }).addTo(this.map);
+          L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 20
+          }).addTo(this.map);
 
-        this.map.on('mousemove', (e) => {
-          this.coordinates.lat = e.latlng.lat.toFixed(4);
-          this.coordinates.lng = e.latlng.lng.toFixed(4);
-        });
+          this.map.on('mousemove', (e) => {
+            this.coordinates.lat = e.latlng.lat.toFixed(4);
+            this.coordinates.lng = e.latlng.lng.toFixed(4);
+          });
 
-        this.map.on('zoomend', () => {
-          this.coordinates.zoom = this.map.getZoom();
-        });
+          this.map.on('zoomend', () => {
+            this.coordinates.zoom = this.map.getZoom();
+          });
 
-        this.loadSites();
+          this.loadSites();
+        } catch (e) {
+          alert('Error during map initialization: ' + e.message);
+        }
       },
 
       loadSites() {
-        fetch('sham_local_data/maps/egypt_sites.geojson')
-          .then(response => response.json())
-          .then(data => {
-            const sitesLayer = L.geoJSON(data, {
-              onEachFeature: (feature, layer) => {
-                let popupContent = `<strong>${feature.properties.name}</strong><br>`;
-                for (const prop in feature.properties) {
-                  if (prop !== 'name') {
-                    popupContent += `<strong>${prop}:</strong> ${feature.properties[prop]}<br>`;
-                  }
-                }
-                layer.bindPopup(popupContent);
+        try {
+          fetch('sham_local_data/maps/egypt_sites.geojson')
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.statusText);
               }
-            }).addTo(this.map);
+              return response.json();
+            })
+            .then(data => {
+              const sitesLayer = L.geoJSON(data, {
+                onEachFeature: (feature, layer) => {
+                  let popupContent = `<strong>${feature.properties.name}</strong><br>`;
+                  for (const prop in feature.properties) {
+                    if (prop !== 'name') {
+                      popupContent += `<strong>${prop}:</strong> ${feature.properties[prop]}<br>`;
+                    }
+                  }
+                  layer.bindPopup(popupContent);
+                }
+              }).addTo(this.map);
 
-            this.stats.totalFeatures = data.features.length;
-            this.stats.activeLayers = 1;
-          });
+              this.stats.totalFeatures = data.features.length;
+              this.stats.activeLayers = 1;
+            })
+            .catch(e => {
+              alert('Error loading site data: ' + e.message);
+            });
+        } catch (e) {
+          alert('Error in loadSites function: ' + e.message);
+        }
       },
 
       setView(mode) {
