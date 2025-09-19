@@ -1,18 +1,43 @@
 {
   "name": "sham-v4-pro",
-  "version": "1.0.0",
-  "description": "Spatial Heritage Archaeological Mapping Platform",
-  "main": "src/index.html",
+  "version": "4.0.0",
+  "description": "SHAM v4 Pro - Archaeological Intelligence Platform with Multispectral Analysis",
+  "main": "index.html",
   "scripts": {
+    "start": "python -m http.server 8080",
     "dev": "python -m http.server 8080",
-    "build": "echo 'Build process to be implemented'",
-    "test": "echo 'Testing framework to be implemented'"
+    "build": "echo 'Static site - no build process required'",
+    "test": "echo 'Testing framework to be implemented'",
+    "deploy": "gh-pages -d ."
   },
-  "keywords": ["archaeology", "gis", "ai", "remote-sensing", "vue", "pwa"],
+  "keywords": [
+    "archaeology",
+    "gis",
+    "ai",
+    "remote-sensing",
+    "leaflet",
+    "satellite-imagery",
+    "egypt",
+    "multispectral-analysis",
+    "geophysical-surveys",
+    "howard-carter",
+    "tutankhamun",
+    "pwa"
+  ],
   "author": "SHAM Development Team",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/yourusername/sham.git"
+  },
+  "homepage": "https://yourusername.github.io/sham",
+  "dependencies": {
+    "leaflet": "^1.9.4"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
