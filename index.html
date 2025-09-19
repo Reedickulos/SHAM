@@ -112,7 +112,7 @@
       },
 
       loadSites() {
-        fetch('SHAM-repo/sham_local_data/maps/egypt_sites.geojson')
+        fetch('sham_local_data/maps/egypt_sites.geojson')
           .then(response => response.json())
           .then(data => {
             const sitesLayer = L.geoJSON(data, {
