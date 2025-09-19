@@ -1,0 +1,17 @@
+Category,Source,URL,Data_Type,Access,Integration_Potential,Priority
+Satellite,NASA Earthdata,https://www.earthdata.nasa.gov/,Multispectral/Temporal,Free,API Available,High
+Satellite,ESA Copernicus,https://dataspace.copernicus.eu/,SAR/Optical,Free,API Available,High
+Satellite,Google Earth Engine,https://earthengine.google.com/,Cloud Computing,Free,Full API,Critical
+Satellite,USGS Earth Explorer,https://earthexplorer.usgs.gov/,Historical/DEM,Free,Download,Medium
+Geophysical,NRIAG Egypt,Contact Required,GPR/Magnetometry,Collaboration,Direct Access,High
+Geophysical,PANGAEA,https://pangaea.de/,Scientific Data,Open,DOI/API,High
+Excavation,Harvard Giza,http://giza.fas.harvard.edu/,Archaeological DB,Free,API Available,Critical
+Excavation,Chicago ISAC,https://isac-idb.uchicago.edu/,Museum Collection,Free,Search API,High
+Excavation,Oxford Griffith,http://www.griffith.ox.ac.uk/,Archive,Registration,Limited API,High
+Museum,British Museum,https://www.britishmuseum.org/collection,Objects,Free,SPARQL,High
+Museum,Metropolitan,https://metmuseum.github.io/,Collection API,Free,Full API,High
+Textual,papyri.info,https://papyri.info/,Papyrus DB,Free,API Available,Medium
+Textual,Cambridge Genizah,https://cudl.lib.cam.ac.uk/collections/genizah/,Manuscripts,Free,IIIF,Medium
+Institutional,UNESCO,https://whc.unesco.org/,World Heritage,Free,Download,Medium
+Specialized,Theban Mapping,thebanmappingproject.com,3D Models,Free,Limited,High
+Specialized,Karnak SITH,http://sith.huma-num.fr/,Monument DB,Free,XML Export,Medium
