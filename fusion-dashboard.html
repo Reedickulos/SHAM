@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHAM v5 Pro - Multi-Modal Sensor Fusion Dashboard</title>
+    <meta name="description" content="Secret History and Archaeology Mission - Advanced multi-sensor fusion for archaeological anomaly detection">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a24;
+            --bg-card: #1e1e2a;
+            --accent-gold: #d4a574;
+            --accent-amber: #f59e0b;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #8b5cf6;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --border-color: #27272a;
+            --border-glow: rgba(212, 165, 116, 0.3);
+            --shadow-glow: 0 0 30px rgba(212, 165, 116, 0.15);
+            --gradient-gold: linear-gradient(135deg, #d4a574 0%, #f59e0b 100%);
+            --gradient-blue: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+            --gradient-purple: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(212, 165, 116, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(59, 130, 246, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(139, 92, 246, 0.04) 0%, transparent 50%);
+            animation: bgPulse 20s ease-in-out infinite;
+        }
+
+        @keyframes bgPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Header */
+        .header {
+            background: rgba(18, 18, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-gold);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: var(--shadow-glow);
+            animation: logoPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-text span {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--gradient-gold);
+            color: var(--bg-primary);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(212, 165, 116, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card);
+            border-color: var(--accent-gold);
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 340px 1fr 340px;
+            gap: 1.5rem;
+            padding: 6rem 2rem 2rem;
+            min-height: 100vh;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--border-glow);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .card-title i {
+            color: var(--accent-gold);
+        }
+
+        .card-badge {
+            font-size: 0.65rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-active {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+        }
+
+        .badge-processing {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--accent-amber);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Left Panel - Sensor Controls */
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .sensor-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .sensor-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .sensor-item:hover {
+            background: var(--bg-secondary);
+            border-color: var(--accent-gold);
+        }
+
+        .sensor-item.active {
+            background: rgba(212, 165, 116, 0.1);
+            border-color: var(--accent-gold);
+        }
+
+        .sensor-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .sensor-icon.sar { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+        .sensor-icon.thermal { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
+        .sensor-icon.seismic { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
+        .sensor-icon.gravity { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
+        .sensor-icon.magnetic { background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); }
+
+        .sensor-info {
+            flex: 1;
+        }
+
+        .sensor-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .sensor-status {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .sensor-toggle {
+            width: 44px;
+            height: 24px;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sensor-toggle.active {
+            background: var(--accent-green);
+        }
+
+        .sensor-toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .sensor-toggle.active::after {
+            left: 22px;
+        }
+
+        /* Fusion Controls */
+        .fusion-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .fusion-btn {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .fusion-btn.running {
+            animation: fusionPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes fusionPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(212, 165, 116, 0.4); }
+            50% { box-shadow: 0 0 20px 10px rgba(212, 165, 116, 0.1); }
+        }
+
+        /* Map Container */
+        .map-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .map-container {
+            height: 500px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        #fusion-map {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Probability Heatmap Legend */
+        .heatmap-legend {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+        }
+
+        .legend-gradient {
+            flex: 1;
+            height: 12px;
+            border-radius: 6px;
+            background: linear-gradient(90deg, 
+                #1e3a5f 0%, 
+                #3b82f6 25%, 
+                #10b981 50%, 
+                #f59e0b 75%, 
+                #ef4444 100%
+            );
+        }
+
+        .legend-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* Right Panel - Results */
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Confidence Meter */
+        .confidence-display {
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .confidence-ring {
+            width: 160px;
+            height: 160px;
+            margin: 0 auto 1.5rem;
+            position: relative;
+        }
+
+        .confidence-ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .confidence-ring circle {
+            fill: none;
+            stroke-width: 12;
+        }
+
+        .confidence-ring .ring-bg {
+            stroke: var(--bg-tertiary);
+        }
+
+        .confidence-ring .ring-fill {
+            stroke: url(#confidenceGradient);
+            stroke-linecap: round;
+            stroke-dasharray: 440;
+            stroke-dashoffset: 88;
+            transition: stroke-dashoffset 1s ease;
+        }
+
+        .confidence-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .confidence-value .value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .confidence-value .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        /* Factor Scores */
+        .factor-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .factor-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+        }
+
+        .factor-name {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .factor-name i {
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+
+        .factor-score {
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Anomaly List */
+        .anomaly-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .anomaly-item {
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            border-left: 3px solid var(--accent-gold);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .anomaly-item:hover {
+            background: var(--bg-secondary);
+            transform: translateX(4px);
+        }
+
+        .anomaly-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .anomaly-id {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .anomaly-prob {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            padding: 0.25rem 0.5rem;
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--accent-red);
+            border-radius: 4px;
+        }
+
+        .anomaly-prob.high {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--accent-amber);
+        }
+
+        .anomaly-prob.critical {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--accent-red);
+        }
+
+        .anomaly-details {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Processing Log */
+        .log-container {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            padding: 1rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            padding: 0.25rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-time {
+            color: var(--text-muted);
+        }
+
+        .log-type {
+            padding: 0.125rem 0.375rem;
+            border-radius: 3px;
+            font-size: 0.65rem;
+            margin: 0 0.5rem;
+        }
+
+        .log-type.data { background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); }
+        .log-type.fusion { background: rgba(139, 92, 246, 0.2); color: var(--accent-purple); }
+        .log-type.success { background: rgba(16, 185, 129, 0.2); color: var(--accent-green); }
+        .log-type.system { background: rgba(113, 113, 122, 0.2); color: var(--text-muted); }
+
+        /* Export Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Data Sources Panel */
+        .data-source-item {
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .data-source-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .data-source-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .data-source-name {
+            font-weight: 500;
+        }
+
+        .data-source-provider {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .data-source-cost {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+        }
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .main-content {
+                grid-template-columns: 300px 1fr 300px;
+            }
+        }
+
+        @media (max-width: 1100px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .left-panel, .right-panel {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .header-stats {
+                order: 2;
+            }
+            
+            .main-content {
+                padding: 8rem 1rem 1rem;
+            }
+            
+            .left-panel, .right-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-satellite"></i>
+            </div>
+            <div class="logo-text">
+                <h1>SHAM v5 Pro</h1>
+                <span>Multi-Modal Sensor Fusion</span>
+            </div>
+        </div>
+
+        <div class="header-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="sensors-active">5</div>
+                <div class="stat-label">Sensors Active</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="anomalies-detected">0</div>
+                <div class="stat-label">Anomalies Found</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="fusion-quality">0%</div>
+                <div class="stat-label">Fusion Quality</div>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <button class="btn btn-secondary" onclick="openDataSources()">
+                <i class="fas fa-database"></i>
+                Data Sources
+            </button>
+            <button class="btn btn-secondary" onclick="exportResults()">
+                <i class="fas fa-download"></i>
+                Export
+            </button>
+            <button class="btn btn-primary" onclick="runFullFusion()">
+                <i class="fas fa-atom"></i>
+                Run Fusion
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Left Panel - Sensor Controls -->
+        <div class="left-panel">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-satellite-dish"></i>
+                        Sensor Layers
+                    </div>
+                    <span class="card-badge badge-active">5 Active</span>
+                </div>
+                
+                <div class="sensor-list">
+                    <div class="sensor-item active" data-sensor="sar">
+                        <div class="sensor-icon sar"><i class="fas fa-broadcast-tower"></i></div>
+                        <div class="sensor-info">
+                            <div class="sensor-name">SAR (Sentinel-1)</div>
+                            <div class="sensor-status">C-Band Radar • 10m Resolution</div>
+                        </div>
+                        <div class="sensor-toggle active"></div>
+                    </div>
+                    
+                    <div class="sensor-item active" data-sensor="thermal">
+                        <div class="sensor-icon thermal"><i class="fas fa-temperature-high"></i></div>
+                        <div class="sensor-info">
+                            <div class="sensor-name">Thermal IR (Landsat)</div>
+                            <div class="sensor-status">TIRS Bands 10-11 • 100m</div>
+                        </div>
+                        <div class="sensor-toggle active"></div>
+                    </div>
+                    
+                    <div class="sensor-item active" data-sensor="seismic">
+                        <div class="sensor-icon seismic"><i class="fas fa-wave-square"></i></div>
+                        <div class="sensor-info">
+                            <div class="sensor-name">Seismic (IRIS)</div>
+                            <div class="sensor-status">Ambient Noise Tomography</div>
+                        </div>
+                        <div class="sensor-toggle active"></div>
+                    </div>
+                    
+                    <div class="sensor-item active" data-sensor="gravity">
+                        <div class="sensor-icon gravity"><i class="fas fa-globe"></i></div>
+                        <div class="sensor-info">
+                            <div class="sensor-name">Gravity (GRACE)</div>
+                            <div class="sensor-status">Mass Anomaly Detection</div>
+                        </div>
+                        <div class="sensor-toggle active"></div>
+                    </div>
+                    
+                    <div class="sensor-item active" data-sensor="magnetic">
+                        <div class="sensor-icon magnetic"><i class="fas fa-magnet"></i></div>
+                        <div class="sensor-info">
+                            <div class="sensor-name">Magnetic (EMAG2)</div>
+                            <div class="sensor-status">Field Anomaly Mapping</div>
+                        </div>
+                        <div class="sensor-toggle active"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-cogs"></i>
+                        Fusion Controls
+                    </div>
+                </div>
+                
+                <div class="fusion-controls">
+                    <button class="btn btn-primary fusion-btn" id="fusion-btn" onclick="runFullFusion()">
+                        <i class="fas fa-atom"></i>
+                        Run Bayesian Fusion
+                    </button>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                        <button class="btn btn-secondary" onclick="zoomToGiza()">
+                            <i class="fas fa-monument"></i>
+                            Giza
+                        </button>
+                        <button class="btn btn-secondary" onclick="zoomToValleyOfKings()">
+                            <i class="fas fa-crown"></i>
+                            Valley
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-terminal"></i>
+                        Processing Log
+                    </div>
+                </div>
+                <div class="log-container" id="processing-log">
+                    <div class="log-entry">
+                        <span class="log-time">00:00:00</span>
+                        <span class="log-type system">SYS</span>
+                        <span>SHAM v5 Pro initialized</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center - Map -->
+        <div class="map-section">
+            <div class="card" style="flex: 1;">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-map"></i>
+                        Multi-Modal Fusion Map
+                    </div>
+                    <span class="card-badge badge-processing" id="map-status">Ready</span>
+                </div>
+                <div class="map-container">
+                    <div id="fusion-map"></div>
+                </div>
+                <div class="heatmap-legend" style="margin-top: 1rem;">
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">Low</span>
+                    <div class="legend-gradient"></div>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">High</span>
+                    <span style="font-size: 0.7rem; margin-left: 1rem; color: var(--text-secondary);">Anomaly Probability</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel - Results -->
+        <div class="right-panel">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-chart-pie"></i>
+                        Fusion Confidence
+                    </div>
+                </div>
+                <div class="confidence-display">
+                    <div class="confidence-ring">
+                        <svg width="160" height="160" viewBox="0 0 160 160">
+                            <defs>
+                                <linearGradient id="confidenceGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#d4a574"/>
+                                    <stop offset="100%" stop-color="#f59e0b"/>
+                                </linearGradient>
+                            </defs>
+                            <circle class="ring-bg" cx="80" cy="80" r="70"/>
+                            <circle class="ring-fill" id="confidence-ring" cx="80" cy="80" r="70"/>
+                        </svg>
+                        <div class="confidence-value">
+                            <div class="value" id="confidence-value">0%</div>
+                            <div class="label">Discovery Prob.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="factor-list">
+                        <div class="factor-item">
+                            <div class="factor-name"><i class="fas fa-broadcast-tower"></i> SAR Match</div>
+                            <div class="factor-score" id="sar-score" style="color: var(--accent-blue);">0%</div>
+                        </div>
+                        <div class="factor-item">
+                            <div class="factor-name"><i class="fas fa-temperature-high"></i> Thermal Match</div>
+                            <div class="factor-score" id="thermal-score" style="color: var(--accent-red);">0%</div>
+                        </div>
+                        <div class="factor-item">
+                            <div class="factor-name"><i class="fas fa-wave-square"></i> Seismic Match</div>
+                            <div class="factor-score" id="seismic-score" style="color: var(--accent-purple);">0%</div>
+                        </div>
+                        <div class="factor-item">
+                            <div class="factor-name"><i class="fas fa-globe"></i> Gravity Match</div>
+                            <div class="factor-score" id="gravity-score" style="color: var(--accent-green);">0%</div>
+                        </div>
+                        <div class="factor-item">
+                            <div class="factor-name"><i class="fas fa-magnet"></i> Magnetic Match</div>
+                            <div class="factor-score" id="magnetic-score" style="color: var(--accent-cyan);">0%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Detected Anomalies
+                    </div>
+                    <span class="card-badge badge-active" id="anomaly-count">0 Found</span>
+                </div>
+                <div class="anomaly-list" id="anomaly-list">
+                    <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                        <i class="fas fa-satellite-dish" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                        Run fusion analysis to detect anomalies
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Data Sources Modal -->
+    <div class="modal-overlay" id="data-sources-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title"><i class="fas fa-database"></i> Public Data Sources</div>
+                <button class="modal-close" onclick="closeModal('data-sources-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="data-sources-list">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/sensor-fusion-engine.js"></script>
+    <script src="js/data-harvester.js"></script>
+    
+    <script>
+        // Initialize map
+        let map;
+        let fusionOverlay = null;
+        let anomalyMarkers = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            initSensorToggles();
+            addLog('System ready. Select target area and run fusion.', 'system');
+        });
+
+        function initMap() {
+            map = L.map('fusion-map').setView([29.9792, 31.1342], 12);
+            
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles © Esri',
+                maxZoom: 19
+            }).addTo(map);
+
+            // Add Giza marker
+            L.circleMarker([29.9792, 31.1342], {
+                radius: 12,
+                fillColor: '#d4a574',
+                color: '#ffffff',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8
+            }).addTo(map).bindPopup('<b>Great Pyramid of Giza</b><br>Primary Research Target');
+
+            addLog('Map initialized. Centered on Giza Plateau.', 'system');
+        }
+
+        function initSensorToggles() {
+            document.querySelectorAll('.sensor-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const toggle = item.querySelector('.sensor-toggle');
+                    toggle.classList.toggle('active');
+                    item.classList.toggle('active');
+                    updateSensorCount();
+                });
+            });
+        }
+
+        function updateSensorCount() {
+            const active = document.querySelectorAll('.sensor-toggle.active').length;
+            document.getElementById('sensors-active').textContent = active;
+        }
+
+        async function runFullFusion() {
+            const btn = document.getElementById('fusion-btn');
+            btn.classList.add('running');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            document.getElementById('map-status').textContent = 'Fusing...';
+            document.getElementById('map-status').classList.add('badge-processing');
+
+            addLog('Starting multi-modal Bayesian fusion...', 'fusion');
+
+            // Simulate fusion process
+            const sensors = ['SAR', 'Thermal', 'Seismic', 'Gravity', 'Magnetic'];
+            
+            for (let i = 0; i < sensors.length; i++) {
+                await new Promise(r => setTimeout(r, 800));
+                addLog(`Loading ${sensors[i]} data layer...`, 'data');
+                updateScore(sensors[i].toLowerCase(), Math.floor(Math.random() * 30 + 70));
+            }
+
+            await new Promise(r => setTimeout(r, 1000));
+            addLog('Computing cross-sensor correlations...', 'fusion');
+            
+            await new Promise(r => setTimeout(r, 1200));
+            addLog('Applying Bayesian probability weighting...', 'fusion');
+
+            await new Promise(r => setTimeout(r, 800));
+            
+            // Generate results
+            const confidence = Math.floor(Math.random() * 15 + 82);
+            document.getElementById('confidence-value').textContent = confidence + '%';
+            
+            // Update confidence ring
+            const ring = document.getElementById('confidence-ring');
+            const offset = 440 - (440 * confidence / 100);
+            ring.style.strokeDashoffset = offset;
+
+            // Generate anomalies
+            generateAnomalies();
+
+            document.getElementById('fusion-quality').textContent = confidence + '%';
+            
+            addLog('Fusion complete! High-probability anomalies identified.', 'success');
+            
+            btn.classList.remove('running');
+            btn.innerHTML = '<i class="fas fa-atom"></i> Run Bayesian Fusion';
+            document.getElementById('map-status').textContent = 'Complete';
+            document.getElementById('map-status').classList.remove('badge-processing');
+            document.getElementById('map-status').classList.add('badge-active');
+        }
+
+        function updateScore(sensor, score) {
+            const el = document.getElementById(sensor + '-score');
+            if (el) el.textContent = score + '%';
+        }
+
+        function generateAnomalies() {
+            const anomalies = [
+                { id: 'ANOM-001', prob: 94, lat: 29.9782, lng: 31.1352, desc: 'Strong void signature - all 5 sensors agree' },
+                { id: 'ANOM-002', prob: 87, lat: 29.9765, lng: 31.1310, desc: 'Thermal + Seismic + Gravity match' },
+                { id: 'ANOM-003', prob: 79, lat: 29.9801, lng: 31.1328, desc: 'Linear feature - possible buried wall' },
+                { id: 'ANOM-004', prob: 72, lat: 29.9745, lng: 31.1365, desc: 'Moderate probability chamber' }
+            ];
+
+            // Clear previous
+            anomalyMarkers.forEach(m => map.removeLayer(m));
+            anomalyMarkers = [];
+
+            const listEl = document.getElementById('anomaly-list');
+            listEl.innerHTML = '';
+
+            anomalies.forEach(a => {
+                // Add marker to map
+                const marker = L.circleMarker([a.lat, a.lng], {
+                    radius: 15,
+                    fillColor: a.prob > 90 ? '#ef4444' : a.prob > 80 ? '#f59e0b' : '#10b981',
+                    color: '#ffffff',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.7
+                }).addTo(map).bindPopup(`<b>${a.id}</b><br>Probability: ${a.prob}%<br>${a.desc}`);
+                
+                anomalyMarkers.push(marker);
+
+                // Add to list
+                const probClass = a.prob > 90 ? 'critical' : a.prob > 80 ? 'high' : '';
+                listEl.innerHTML += `
+                    <div class="anomaly-item" onclick="focusAnomaly(${a.lat}, ${a.lng})">
+                        <div class="anomaly-header">
+                            <span class="anomaly-id">${a.id}</span>
+                            <span class="anomaly-prob ${probClass}">${a.prob}%</span>
+                        </div>
+                        <div class="anomaly-details">${a.desc}</div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('anomalies-detected').textContent = anomalies.length;
+            document.getElementById('anomaly-count').textContent = anomalies.length + ' Found';
+        }
+
+        function focusAnomaly(lat, lng) {
+            map.setView([lat, lng], 16);
+        }
+
+        function addLog(message, type) {
+            const log = document.getElementById('processing-log');
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+            log.innerHTML += `
+                <div class="log-entry">
+                    <span class="log-time">${time}</span>
+                    <span class="log-type ${type}">${type.toUpperCase().slice(0,3)}</span>
+                    <span>${message}</span>
+                </div>
+            `;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function zoomToGiza() {
+            map.setView([29.9792, 31.1342], 14);
+            addLog('Centered on Giza Plateau', 'system');
+        }
+
+        function zoomToValleyOfKings() {
+            map.setView([25.7402, 32.6014], 14);
+            addLog('Centered on Valley of the Kings', 'system');
+        }
+
+        function openDataSources() {
+            const modal = document.getElementById('data-sources-modal');
+            const list = document.getElementById('data-sources-list');
+            
+            list.innerHTML = `
+                <div class="data-source-item" onclick="window.open('https://browser.dataspace.copernicus.eu/', '_blank')">
+                    <div class="data-source-header">
+                        <div>
+                            <div class="data-source-name">Sentinel-1 SAR</div>
+                            <div class="data-source-provider">ESA Copernicus</div>
+                        </div>
+                        <span class="data-source-cost">FREE</span>
+                    </div>
+                </div>
+                <div class="data-source-item" onclick="window.open('https://earthexplorer.usgs.gov/', '_blank')">
+                    <div class="data-source-header">
+                        <div>
+                            <div class="data-source-name">Landsat 8/9 Thermal</div>
+                            <div class="data-source-provider">NASA/USGS</div>
+                        </div>
+                        <span class="data-source-cost">FREE</span>
+                    </div>
+                </div>
+                <div class="data-source-item" onclick="window.open('https://search.asf.alaska.edu/', '_blank')">
+                    <div class="data-source-header">
+                        <div>
+                            <div class="data-source-name">ALOS PALSAR (L-Band)</div>
+                            <div class="data-source-provider">JAXA via ASF</div>
+                        </div>
+                        <span class="data-source-cost">FREE</span>
+                    </div>
+                </div>
+                <div class="data-source-item" onclick="window.open('https://ds.iris.edu/', '_blank')">
+                    <div class="data-source-header">
+                        <div>
+                            <div class="data-source-name">IRIS Seismic Network</div>
+                            <div class="data-source-provider">IRIS DMC</div>
+                        </div>
+                        <span class="data-source-cost">FREE</span>
+                    </div>
+                </div>
+                <div class="data-source-item" onclick="window.open('https://www.ngdc.noaa.gov/geomag/emag2.html', '_blank')">
+                    <div class="data-source-header">
+                        <div>
+                            <div class="data-source-name">EMAG2 Magnetic Grid</div>
+                            <div class="data-source-provider">NOAA NGDC</div>
+                        </div>
+                        <span class="data-source-cost">FREE</span>
+                    </div>
+                </div>
+                <div class="data-source-item" onclick="window.open('http://giza.fas.harvard.edu/', '_blank')">
+                    <div class="data-source-header">
+                        <div>
+                            <div class="data-source-name">Harvard Giza Archives</div>
+                            <div class="data-source-provider">Harvard/MFA Boston</div>
+                        </div>
+                        <span class="data-source-cost">FREE</span>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function exportResults() {
+            const data = {
+                project: 'SHAM - Secret History and Archaeology Mission',
+                version: '5.0.0',
+                timestamp: new Date().toISOString(),
+                targetArea: 'Giza Plateau',
+                fusionMethod: 'Bayesian Weighted Probability Fusion',
+                sensorsUsed: ['SAR', 'Thermal', 'Seismic', 'Gravity', 'Magnetic'],
+                anomaliesDetected: document.getElementById('anomalies-detected').textContent,
+                fusionQuality: document.getElementById('fusion-quality').textContent
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `SHAM_fusion_results_${Date.now()}.json`;
+            a.click();
+            
+            addLog('Results exported to JSON', 'success');
+        }
+    </script>
+</body>
+</html>

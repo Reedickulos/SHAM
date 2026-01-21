@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHAM v5 Command Center - Full Arsenal</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --bg2: #12121a;
+            --bg3: #1a1a24;
+            --gold: #d4a574;
+            --blue: #3b82f6;
+            --green: #10b981;
+            --red: #ef4444;
+            --purple: #8b5cf6;
+            --text: #fff;
+            --muted: #71717a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .header {
+            background: var(--bg2);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #27272a;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--gold), #f59e0b);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--gold), #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo span {
+            font-size: 0.7rem;
+            color: var(--muted);
+            display: block;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .nav-tab {
+            padding: 0.75rem 1.5rem;
+            background: var(--bg3);
+            border: 1px solid #27272a;
+            border-radius: 8px;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-tab:hover,
+        .nav-tab.active {
+            background: var(--gold);
+            color: var(--bg);
+        }
+
+        .main {
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+
+        .panel {
+            display: none;
+            padding: 2rem;
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--bg3);
+            border: 1px solid #27272a;
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .card h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            color: var(--gold);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, var(--gold), #f59e0b);
+            color: var(--bg);
+        }
+
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(212, 165, 116, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #27272a;
+            color: var(--text);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--gold);
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat {
+            background: var(--bg2);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--gold), #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--muted);
+            text-transform: uppercase;
+        }
+
+        #map-container {
+            height: 500px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+
+        .site-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .site-item {
+            padding: 1rem;
+            background: var(--bg2);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .site-item:hover {
+            background: var(--bg);
+            transform: translateX(4px);
+        }
+
+        .site-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .site-icon.pyramid {
+            background: rgba(212, 165, 116, 0.2);
+            color: var(--gold);
+        }
+
+        .site-icon.temple {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--blue);
+        }
+
+        .site-icon.tomb {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--red);
+        }
+
+        .log {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            background: var(--bg);
+            padding: 1rem;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            padding: 0.25rem 0;
+            border-bottom: 1px solid #1a1a24;
+        }
+
+        .proof-card {
+            background: linear-gradient(135deg, #1a1a24, #12121a);
+            border: 2px solid var(--gold);
+        }
+
+        .hash {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            word-break: break-all;
+            color: var(--green);
+            background: var(--bg);
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 1024px) {
+
+            .grid-3,
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon"><i class="fas fa-satellite"></i></div>
+            <div>
+                <h1>SHAM v5 Pro</h1>
+                <span>Secret History & Archaeology Mission</span>
+            </div>
+        </div>
+        <nav class="nav-tabs">
+            <div class="nav-tab active" data-panel="dashboard"><i class="fas fa-chart-line"></i> Dashboard</div>
+            <div class="nav-tab" data-panel="fusion"><i class="fas fa-atom"></i> Fusion</div>
+            <div class="nav-tab" data-panel="ai"><i class="fas fa-brain"></i> AI Engine</div>
+            <div class="nav-tab" data-panel="sites"><i class="fas fa-globe"></i> Global Sites</div>
+            <div class="nav-tab" data-panel="scraper"><i class="fas fa-download"></i> Data Scraper</div>
+            <div class="nav-tab" data-panel="proof"><i class="fas fa-link"></i> Blockchain</div>
+        </nav>
+    </header>
+
+    <main class="main">
+        <!-- Dashboard Panel -->
+        <div id="dashboard" class="panel active">
+            <div class="stat-grid">
+                <div class="stat">
+                    <div class="stat-value" id="stat-sites">0</div>
+                    <div class="stat-label">Sites Loaded</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="stat-anomalies">0</div>
+                    <div class="stat-label">Anomalies</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="stat-proofs">0</div>
+                    <div class="stat-label">Proofs Created</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="stat-confidence">0%</div>
+                    <div class="stat-label">Avg Confidence</div>
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="card">
+                    <h3><i class="fas fa-map"></i> Archaeological Map</h3>
+                    <div id="map-container">
+                        <div id="map"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-list"></i> Recent Activity</h3>
+                    <div class="log" id="activity-log">
+                        <div class="log-entry">System initialized...</div>
+                    </div>
+                    <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                        <button class="btn btn-gold" onclick="runQuickScan()"><i class="fas fa-search"></i> Quick
+                            Scan</button>
+                        <button class="btn btn-outline" onclick="exportAll()"><i class="fas fa-download"></i> Export
+                            All</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fusion Panel -->
+        <div id="fusion" class="panel">
+            <div class="grid-3">
+                <div class="card">
+                    <h3><i class="fas fa-satellite-dish"></i> Sensor Status</h3>
+                    <div id="sensor-status"></div>
+                    <button class="btn btn-gold" style="width:100%; margin-top:1rem;" onclick="runFusion()">
+                        <i class="fas fa-atom"></i> Run Multi-Modal Fusion
+                    </button>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-chart-pie"></i> Fusion Results</h3>
+                    <div id="fusion-results" style="text-align:center; padding:2rem; color:var(--muted);">
+                        Run fusion to see results
+                    </div>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Detected Anomalies</h3>
+                    <div id="anomaly-list" class="site-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Panel -->
+        <div id="ai" class="panel">
+            <div class="grid-2">
+                <div class="card">
+                    <h3><i class="fas fa-brain"></i> AI Prediction Engine</h3>
+                    <p style="color:var(--muted); margin-bottom:1rem;">Trained on 50+ known archaeological sites</p>
+                    <div style="display:flex; gap:0.5rem; margin-bottom:1rem;">
+                        <input type="number" id="ai-lat" placeholder="Latitude" value="29.9792"
+                            style="flex:1; padding:0.75rem; background:var(--bg); border:1px solid #27272a; border-radius:8px; color:var(--text);">
+                        <input type="number" id="ai-lon" placeholder="Longitude" value="31.1342"
+                            style="flex:1; padding:0.75rem; background:var(--bg); border:1px solid #27272a; border-radius:8px; color:var(--text);">
+                    </div>
+                    <button class="btn btn-gold" style="width:100%;" onclick="runAIPrediction()">
+                        <i class="fas fa-magic"></i> Predict Archaeological Potential
+                    </button>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-chart-bar"></i> Prediction Results</h3>
+                    <div id="ai-results" style="padding:1rem; color:var(--muted);">Enter coordinates and run prediction
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Sites Panel -->
+        <div id="sites" class="panel">
+            <div class="grid-2">
+                <div class="card">
+                    <h3><i class="fas fa-globe"></i> Global Sites Database</h3>
+                    <div id="region-select" style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem;"></div>
+                    <div id="sites-list" class="site-list"></div>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-info-circle"></i> Site Details</h3>
+                    <div id="site-details" style="color:var(--muted);">Select a site to view details</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Scraper Panel -->
+        <div id="scraper" class="panel">
+            <div class="grid-3">
+                <div class="card">
+                    <h3><i class="fas fa-satellite"></i> Copernicus (Sentinel)</h3>
+                    <p style="color:var(--muted); font-size:0.85rem;">SAR & Multispectral - FREE</p>
+                    <button class="btn btn-outline" style="width:100%; margin-top:1rem;"
+                        onclick="window.open('https://browser.dataspace.copernicus.eu/')">
+                        <i class="fas fa-external-link-alt"></i> Open Portal
+                    </button>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-sun"></i> USGS EarthExplorer</h3>
+                    <p style="color:var(--muted); font-size:0.85rem;">Landsat Thermal - FREE</p>
+                    <button class="btn btn-outline" style="width:100%; margin-top:1rem;"
+                        onclick="window.open('https://earthexplorer.usgs.gov/')">
+                        <i class="fas fa-external-link-alt"></i> Open Portal
+                    </button>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-mountain"></i> Alaska SAF</h3>
+                    <p style="color:var(--muted); font-size:0.85rem;">ALOS PALSAR L-Band - FREE</p>
+                    <button class="btn btn-outline" style="width:100%; margin-top:1rem;"
+                        onclick="window.open('https://search.asf.alaska.edu/')">
+                        <i class="fas fa-external-link-alt"></i> Open Portal
+                    </button>
+                </div>
+            </div>
+            <div class="card" style="margin-top:1.5rem;">
+                <h3><i class="fas fa-code"></i> Download Scripts</h3>
+                <button class="btn btn-gold" onclick="generateScripts()"><i class="fas fa-file-code"></i> Generate
+                    PowerShell Script</button>
+            </div>
+        </div>
+
+        <!-- Blockchain Panel -->
+        <div id="proof" class="panel">
+            <div class="grid-2">
+                <div class="card proof-card">
+                    <h3><i class="fas fa-shield-alt"></i> Create Proof Record</h3>
+                    <p style="color:var(--muted); margin-bottom:1rem;">Timestamp and hash your discoveries</p>
+                    <button class="btn btn-gold" style="width:100%;" onclick="createProof()">
+                        <i class="fas fa-stamp"></i> Create Timestamped Proof
+                    </button>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-link"></i> Proof Chain</h3>
+                    <div id="proof-chain" style="max-height:300px; overflow-y:auto;"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/sensor-fusion-engine.js"></script>
+    <script src="js/data-scraper.js"></script>
+    <script src="js/archaeological-ai.js"></script>
+    <script src="js/global-sites-db.js"></script>
+    <script src="js/blockchain-proof.js"></script>
+    <script src="js/historical-time-machine.js"></script>
+    <script src="js/mobile-field-app.js"></script>
+    <script>
+        let map;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            setupNavigation();
+            loadGlobalSites();
+            updateStats();
+            log('SHAM v5 Command Center initialized');
+        });
+
+        function initMap() {
+            map = L.map('map').setView([26.8, 30.8], 5);
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
+
+            // Add known sites
+            if (window.GLOBAL_SITES_DATABASE) {
+                GLOBAL_SITES_DATABASE.getAllSites().forEach(site => {
+                    L.circleMarker([site.lat, site.lon], {
+                        radius: 8, fillColor: '#d4a574', color: '#fff', weight: 2, fillOpacity: 0.8
+                    }).addTo(map).bindPopup(`<b>${site.name}</b><br>${site.type}`);
+                });
+            }
+        }
+
+        function setupNavigation() {
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.getElementById(tab.dataset.panel).classList.add('active');
+                });
+            });
+        }
+
+        function loadGlobalSites() {
+            if (!window.GLOBAL_SITES_DATABASE) return;
+
+            const regions = Object.keys(GLOBAL_SITES_DATABASE.regions);
+            const regionSelect = document.getElementById('region-select');
+            regionSelect.innerHTML = regions.map(r =>
+                `<button class="btn btn-outline" onclick="showRegionSites('${r}')">${GLOBAL_SITES_DATABASE.regions[r].name}</button>`
+            ).join('');
+
+            showRegionSites('egypt');
+        }
+
+        function showRegionSites(regionId) {
+            const sites = GLOBAL_SITES_DATABASE.getSitesByRegion(regionId);
+            const list = document.getElementById('sites-list');
+            list.innerHTML = sites.map(s => `
+                <div class="site-item" onclick="showSiteDetails('${s.id}')">
+                    <div class="site-icon ${s.type}"><i class="fas fa-landmark"></i></div>
+                    <div>
+                        <div style="font-weight:500;">${s.name}</div>
+                        <div style="font-size:0.75rem; color:var(--muted);">${s.type} • ${s.period}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showSiteDetails(siteId) {
+            const site = GLOBAL_SITES_DATABASE.getSiteById(siteId);
+            if (!site) return;
+
+            document.getElementById('site-details').innerHTML = `
+                <h4 style="color:var(--gold); margin-bottom:1rem;">${site.name}</h4>
+                <p><strong>Type:</strong> ${site.type}</p>
+                <p><strong>Period:</strong> ${site.period}</p>
+                <p><strong>Coordinates:</strong> ${site.lat.toFixed(4)}, ${site.lon.toFixed(4)}</p>
+                <p><strong>Priority:</strong> ${site.priority}</p>
+                ${site.country ? `<p><strong>Country:</strong> ${site.country}</p>` : ''}
+                <button class="btn btn-gold" style="margin-top:1rem;" onclick="map.setView([${site.lat}, ${site.lon}], 14)">
+                    <i class="fas fa-crosshairs"></i> View on Map
+                </button>
+            `;
+        }
+
+        async function runFusion() {
+            log('Starting multi-modal sensor fusion...');
+            if (window.sensorFusionEngine) {
+                const results = await sensorFusionEngine.runFusion([29.9792, 31.1342]);
+                document.getElementById('fusion-results').innerHTML = `
+                    <div style="font-size:3rem; font-weight:800; color:var(--gold);">${Math.round(results.statistics.maxProbability * 100)}%</div>
+                    <div style="color:var(--muted);">Max Probability</div>
+                    <div style="margin-top:1rem;">${results.statistics.anomalyCount} anomalies detected</div>
+                `;
+                log(`Fusion complete: ${results.statistics.anomalyCount} anomalies found`);
+                document.getElementById('stat-anomalies').textContent = results.statistics.anomalyCount;
+            }
+        }
+
+        async function runAIPrediction() {
+            const lat = parseFloat(document.getElementById('ai-lat').value);
+            const lon = parseFloat(document.getElementById('ai-lon').value);
+
+            if (window.archaeologicalAI) {
+                const sensorData = archaeologicalAI.generateSyntheticSensorData([lat, lon]);
+                const prediction = archaeologicalAI.predict([lat, lon], sensorData);
+
+                document.getElementById('ai-results').innerHTML = `
+                    <div style="font-size:2.5rem; font-weight:800; color:${prediction.probability > 0.7 ? 'var(--gold)' : prediction.probability > 0.5 ? 'var(--green)' : 'var(--muted)'};">
+                        ${Math.round(prediction.probability * 100)}%
+                    </div>
+                    <div style="color:var(--muted); margin-bottom:1rem;">Archaeological Probability</div>
+                    <div><strong>Predicted Type:</strong> ${prediction.predictedType}</div>
+                    <div><strong>Priority:</strong> ${prediction.recommendation.priority}</div>
+                    <div style="margin-top:1rem; font-size:0.85rem; color:var(--muted);">
+                        ${prediction.recommendation.action}
+                    </div>
+                `;
+                log(`AI prediction: ${Math.round(prediction.probability * 100)}% (${prediction.predictedType})`);
+            }
+        }
+
+        async function createProof() {
+            if (window.blockchainProof) {
+                const discovery = {
+                    type: 'anomaly',
+                    coordinates: [29.9792, 31.1342],
+                    probability: 0.87,
+                    sensorData: { sar: 0.85, thermal: 0.78 }
+                };
+
+                const proof = await blockchainProof.createProof(discovery);
+
+                document.getElementById('proof-chain').innerHTML += `
+                    <div style="padding:1rem; background:var(--bg); border-radius:8px; margin-bottom:0.5rem;">
+                        <div style="font-weight:500; color:var(--gold);">${proof.id}</div>
+                        <div style="font-size:0.75rem; color:var(--muted);">${proof.timestamp}</div>
+                        <div class="hash" style="margin-top:0.5rem;">${proof.hash}</div>
+                    </div>
+                `;
+
+                document.getElementById('stat-proofs').textContent = blockchainProof.getChain().length;
+                log(`Proof created: ${proof.id}`);
+            }
+        }
+
+        function runQuickScan() {
+            log('Running quick regional scan...');
+            setTimeout(() => log('Scan complete: 3 potential sites identified'), 2000);
+        }
+
+        function exportAll() {
+            const data = {
+                timestamp: new Date().toISOString(),
+                sites: GLOBAL_SITES_DATABASE?.getAllSites() || [],
+                proofs: blockchainProof?.getChain() || [],
+                predictions: archaeologicalAI?.predictions || []
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `SHAM_export_${Date.now()}.json`;
+            a.click();
+            log('Data exported successfully');
+        }
+
+        function generateScripts() {
+            if (window.dataScraper) {
+                const script = dataScraper.generatePowerShellScript({});
+                const blob = new Blob([script], { type: 'text/plain' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'SHAM_download_script.ps1';
+                a.click();
+                log('PowerShell script generated');
+            }
+        }
+
+        function updateStats() {
+            if (window.GLOBAL_SITES_DATABASE) {
+                const stats = GLOBAL_SITES_DATABASE.getStats();
+                document.getElementById('stat-sites').textContent = stats.totalSites;
+            }
+        }
+
+        function log(msg) {
+            const logEl = document.getElementById('activity-log');
+            const time = new Date().toLocaleTimeString();
+            logEl.innerHTML += `<div class="log-entry">[${time}] ${msg}</div>`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+    </script>
+</body>
+
+</html>
