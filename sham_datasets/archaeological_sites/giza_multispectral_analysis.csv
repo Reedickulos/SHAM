@@ -1,0 +1,4 @@
+site_name,lat,lon,ndvi,thermal_anomaly,visible_spectrum,nir_response,swir_response,analysis_date
+Great Pyramid of Giza,29.9792345,31.1342019,0.15,Detected,Limestone signature,Low,High mineral content,2024-03-15
+Khafre Pyramid,29.9755,31.1306,0.12,None,Limestone signature,Low,High mineral content,2024-03-15
+Menkaure Pyramid,29.9722,31.1281,0.18,Minor,Mixed stone signature,Medium,Medium mineral content,2024-03-15

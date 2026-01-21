@@ -1,0 +1,5 @@
+filename,category,size_kb,path,created
+giza_multispectral_analysis.csv,archaeological_sites,0.41,C:/sham_datasets\archaeological_sites\giza_multispectral_analysis.csv,2025-09-18 02:16:36
+global_archaeological_sites.csv,archaeological_sites,0.74,C:/sham_datasets\archaeological_sites\global_archaeological_sites.csv,2025-09-18 02:16:36
+archaeological_sites_elevation.csv,elevation,0.34,C:/sham_datasets\elevation\archaeological_sites_elevation.csv,2025-09-18 02:16:36
+acquisition_log.txt,metadata,1.83,C:/sham_datasets\metadata\acquisition_log.txt,2025-09-18 02:16:24

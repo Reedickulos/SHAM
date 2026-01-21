@@ -1,0 +1,11 @@
+name,country,lat,lon,type,period,unesco
+Giza Pyramid Complex,Egypt,29.9792,31.1342,Pyramids,Old Kingdom,True
+Stonehenge,United Kingdom,51.1789,-1.8262,Stone Circle,Neolithic,True
+Angkor Archaeological Park,Cambodia,13.4125,103.867,Temple Complex,Khmer Empire,True
+Historic Sanctuary of Machu Picchu,Peru,-13.1631,-72.545,Citadel,Inca,True
+Chichen Itza,Mexico,20.6843,-88.5678,Maya City,Classic Maya,True
+Petra,Jordan,30.3285,35.4444,Rock City,Nabataean,True
+Acropolis of Athens,Greece,37.9715,23.7267,Citadel,Classical Greek,True
+Archaeological Areas of Pompeii,Italy,40.7489,14.4989,Roman City,Roman,True
+Göbekli Tepe,Turkey,37.2233,38.9225,Temple,Pre-Pottery Neolithic,True
+Easter Island,Chile,-27.1127,-109.3497,Moai Statues,Polynesian,True

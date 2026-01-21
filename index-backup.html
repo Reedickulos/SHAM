@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHAM v4 Pro - Archaeological Intelligence Platform</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="archaeological-loader">
+                <div class="pyramid"></div>
+                <div class="scanning-line"></div>
+            </div>
+            <h2>SHAM v4 Pro</h2>
+            <p>Archaeological Intelligence Platform</p>
+            <div class="loading-progress">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <p class="loading-status" id="loading-status">Initializing satellite data...</p>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="app" class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <i class="fas fa-satellite"></i>
+                    <span>SHAM v4 Pro</span>
+                </div>
+                <div class="coordinates-display">
+                    <span id="current-coordinates">29.9792°N, 31.1342°E</span>
+                </div>
+            </div>
+            <div class="header-center">
+                <h1>Archaeological Intelligence Platform</h1>
+                <div class="status-indicators">
+                    <div class="status-item" id="satellite-status">
+                        <i class="fas fa-satellite-dish"></i>
+                        <span>Satellite: Active</span>
+                    </div>
+                    <div class="status-item" id="data-status">
+                        <i class="fas fa-database"></i>
+                        <span>Data: 847 Sites</span>
+                    </div>
+                    <div class="status-item" id="ai-status">
+                        <i class="fas fa-brain"></i>
+                        <span>AI: Processing</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="btn-toggle" id="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="btn-export" id="export-data">
+                    <i class="fas fa-download"></i>
+                    Export
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <!-- Layer Controls -->
+                <div class="panel">
+                    <h3><i class="fas fa-layer-group"></i> Spectral Layers</h3>
+                    <div class="layer-controls">
+                        <div class="layer-item">
+                            <label class="layer-toggle">
+                                <input type="checkbox" id="vis-layer" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="layer-name">Visible (VIS)</span>
+                                <span class="layer-wavelength">400-700nm</span>
+                            </label>
+                        </div>
+                        <div class="layer-item">
+                            <label class="layer-toggle">
+                                <input type="checkbox" id="nir-layer">
+                                <span class="toggle-slider"></span>
+                                <span class="layer-name">Near-IR (NIR)</span>
+                                <span class="layer-wavelength">700-1400nm</span>
+                            </label>
+                        </div>
+                        <div class="layer-item">
+                            <label class="layer-toggle">
+                                <input type="checkbox" id="swir-layer">
+                                <span class="toggle-slider"></span>
+                                <span class="layer-name">Short-IR (SWIR)</span>
+                                <span class="layer-wavelength">1400-3000nm</span>
+                            </label>
+                        </div>
+                        <div class="layer-item">
+                            <label class="layer-toggle">
+                                <input type="checkbox" id="tir-layer">
+                                <span class="toggle-slider"></span>
+                                <span class="layer-name">Thermal-IR (TIR)</span>
+                                <span class="layer-wavelength">8000-14000nm</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Archaeological Sites -->
+                <div class="panel">
+                    <h3><i class="fas fa-map-marker-alt"></i> Archaeological Sites</h3>
+                    <div class="sites-list" id="sites-list">
+                        <!-- Sites will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Analysis Tools -->
+                <div class="panel">
+                    <h3><i class="fas fa-search"></i> Analysis Tools</h3>
+                    <div class="analysis-tools">
+                        <button class="tool-btn" id="anomaly-detection">
+                            <i class="fas fa-eye"></i>
+                            Anomaly Detection
+                        </button>
+                        <button class="tool-btn" id="predictive-analysis">
+                            <i class="fas fa-brain"></i>
+                            AI Prediction
+                        </button>
+                        <button class="tool-btn" id="temporal-analysis">
+                            <i class="fas fa-clock"></i>
+                            Temporal Analysis
+                        </button>
+                        <button class="tool-btn" id="geophysical-overlay">
+                            <i class="fas fa-mountain"></i>
+                            GPR Overlay
+                        </button>
+                    </div>
+                </div>
+
+                <!-- AI Confidence Score -->
+                <div class="panel">
+                    <h3><i class="fas fa-chart-line"></i> AI Confidence</h3>
+                    <div class="confidence-meter">
+                        <div class="confidence-circle">
+                            <div class="confidence-fill" id="confidence-fill"></div>
+                            <div class="confidence-text">
+                                <span id="confidence-score">87%</span>
+                                <small>Discovery Probability</small>
+                            </div>
+                        </div>
+                        <div class="confidence-factors">
+                            <div class="factor">
+                                <span>Spectral Anomalies</span>
+                                <span class="factor-score">92%</span>
+                            </div>
+                            <div class="factor">
+                                <span>Geophysical Signals</span>
+                                <span class="factor-score">81%</span>
+                            </div>
+                            <div class="factor">
+                                <span>Historical Correlation</span>
+                                <span class="factor-score">89%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Map Container -->
+            <div class="map-container">
+                <div id="map" class="map"></div>
+
+                <!-- Map Controls -->
+                <div class="map-controls">
+                    <button class="map-btn" id="zoom-egypt">
+                        <i class="fas fa-search-location"></i>
+                        Egypt
+                    </button>
+                    <button class="map-btn" id="zoom-giza">
+                        <i class="fas fa-monument"></i>
+                        Giza
+                    </button>
+                    <button class="map-btn" id="zoom-valley-kings">
+                        <i class="fas fa-crown"></i>
+                        Valley of Kings
+                    </button>
+                    <button class="map-btn" id="satellite-view">
+                        <i class="fas fa-satellite"></i>
+                        Satellite
+                    </button>
+                </div>
+
+                <!-- Legend -->
+                <div class="map-legend">
+                    <h4>Legend</h4>
+                    <div class="legend-item">
+                        <span class="legend-marker pyramid"></span>
+                        <span>Pyramids</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-marker temple"></span>
+                        <span>Temples</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-marker tomb"></span>
+                        <span>Tombs</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-marker settlement"></span>
+                        <span>Settlements</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-marker anomaly"></span>
+                        <span>AI Detected</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Site Information Panel -->
+            <div class="info-panel" id="info-panel">
+                <div class="info-header">
+                    <h3 id="site-title">Select a site to view details</h3>
+                    <button class="close-btn" id="close-info">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="info-content" id="info-content">
+                    <p>Click on any archaeological site marker to view detailed information including excavation history, artifacts, and satellite analysis.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/archaeological-sites.js"></script>
+    <script src="js/satellite-data.js"></script>
+    <script src="js/geophysical-data.js"></script>
+    <script src="js/museum-data.js"></script>
+    <script src="js/map-manager.js"></script>
+    <script src="js/ui-manager.js"></script>
+    <script src="js/analysis-engine.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
